@@ -1,5 +1,5 @@
 // קטלוג הבגדים – כדי להוסיף פריט, מוסיפים שורה לרשימה.
-// category: אחד מהמפתחות ב-CATEGORIES. price: אופציונלי (למשל "₪199").
+// category: אחד מהמפתחות ב-CATEGORIES. price: אופציונלי (למשל "₪199"). isNew: true מציג תגית NEW.
 const CATEGORIES = {
   sets: 'חליפות וסטים',
   pants: 'מכנסיים וג׳ינסים',

@@ -60,14 +60,23 @@
     </div>
   </div>
 
-  <section class="section section--light" id="catalog">
+  <section class="shop" id="catalog">
     <div class="container">
-      <div class="section__head">
-        <p class="eyebrow eyebrow--dark">הקטלוג</p>
-        <h2 class="section__title">הבגדים בחנות</h2>
-        <p class="section__sub">ראיתם משהו שאהבתם? לחצו "להזמנה" ונחזור אליכם בוואטסאפ</p>
+      <div class="shop__head">
+        <div>
+          <p class="eyebrow eyebrow--dark">SHOP</p>
+          <h2 class="shop__title">הקטלוג</h2>
+        </div>
+        <p class="shop__note">ראיתם משהו שאהבתם? לחצו על הפריט ונחזור אליכם בוואטסאפ עם מידות וזמינות.</p>
       </div>
-      <div class="filters" id="filters" role="tablist"></div>
+    </div>
+    <div class="shop__bar">
+      <div class="container shop__bar-inner">
+        <div class="filters" id="filters" role="tablist"></div>
+        <span class="shop__count" id="catalogCount"></span>
+      </div>
+    </div>
+    <div class="container">
       <div class="catalog" id="catalogGrid"></div>
     </div>
   </section>
