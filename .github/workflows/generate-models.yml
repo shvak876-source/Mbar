@@ -7,8 +7,8 @@ on:
         description: "How many photos to process (0 = all)"
         default: "3"
       model:
-        description: "OpenAI image model"
-        default: "gpt-image-1"
+        description: "Gemini image model"
+        default: "gemini-2.5-flash-image"
 
 permissions:
   contents: write
@@ -24,10 +24,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install openai pillow
+      - run: pip install requests pillow
       - run: python tools/generate_models.py
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           IMAGE_MODEL: ${{ inputs.model }}
           LIMIT: ${{ inputs.limit }}
       - name: Commit results
