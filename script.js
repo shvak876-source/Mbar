@@ -35,14 +35,14 @@ const count = document.getElementById('catalogCount');
 const renderCatalog = category => {
   const items = PRODUCTS.filter(p => category === 'all' || p.category === category);
   count.textContent = `${items.length} פריטים`;
-  grid.innerHTML = '';
+  grid.innerHTML = items.length ? '' : '<p class="catalog__empty">עוד אין פריטים בקטגוריה הזו – שלחו לנו הודעה ונעדכן.</p>';
   items.forEach(item => {
     const card = document.createElement('article');
     card.className = 'product';
     card.innerHTML = `
       <div class="product__media">
         <button class="product__zoom" type="button" aria-label="הגדלה: ${item.name}">
-          <img src="${item.image}" alt="${item.name}" loading="lazy">
+          <img src="${item.image}" alt="${item.name}" width="600" height="800" loading="lazy">
         </button>
         ${item.isNew ? '<span class="product__badge">NEW</span>' : ''}
         <a class="product__quick" href="${orderLink(item)}" target="_blank" rel="noopener">${WA_ICON}<span>להזמנה בוואטסאפ</span></a>
@@ -59,11 +59,11 @@ const renderCatalog = category => {
 [['all', 'הכל'], ...usedCategories.map(key => [key, CATEGORIES[key]])].forEach(([key, label], i) => {
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = 'filter' + (i === 0 ? ' filter--active' : '');
+  btn.className = 'filter';
+  btn.setAttribute('aria-pressed', i === 0);
   btn.textContent = label;
   btn.addEventListener('click', () => {
-    filters.querySelectorAll('.filter').forEach(b => b.classList.remove('filter--active'));
-    btn.classList.add('filter--active');
+    filters.querySelectorAll('.filter').forEach(b => b.setAttribute('aria-pressed', b === btn));
     renderCatalog(key);
   });
   filters.appendChild(btn);
@@ -72,7 +72,10 @@ renderCatalog('all');
 
 // Lightbox
 const lightbox = document.getElementById('lightbox');
+const lightboxClose = document.getElementById('lightboxClose');
+let lastFocus = null;
 const openLightbox = item => {
+  lastFocus = document.activeElement;
   document.getElementById('lightboxImg').src = item.image;
   document.getElementById('lightboxImg').alt = item.name;
   document.getElementById('lightboxTitle').textContent = item.name;
@@ -80,14 +83,26 @@ const openLightbox = item => {
   document.getElementById('lightboxOrder').href = orderLink(item);
   lightbox.hidden = false;
   document.body.classList.add('no-scroll');
+  lightboxClose.focus();
 };
 const closeLightbox = () => {
   lightbox.hidden = true;
   document.body.classList.remove('no-scroll');
+  if (lastFocus) lastFocus.focus();
 };
-document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+lightboxClose.addEventListener('click', closeLightbox);
 lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && !lightbox.hidden) closeLightbox(); });
+document.addEventListener('keydown', e => {
+  if (lightbox.hidden) return;
+  if (e.key === 'Escape') closeLightbox();
+  // Keep Tab focus inside the dialog
+  if (e.key === 'Tab') {
+    const focusable = [...lightbox.querySelectorAll('button, a[href]')];
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+});
 
 // Fade sections in as they scroll into view
 const observer = new IntersectionObserver(entries => {
