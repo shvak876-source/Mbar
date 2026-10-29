@@ -75,12 +75,12 @@
       </div>
     </div>
     <div class="shop__bar">
-      <div class="container shop__bar-inner">
+      <div class="container">
         <div class="filters" id="filters" role="group" aria-label="סינון לפי קטגוריה"></div>
-        <span class="shop__count" id="catalogCount" aria-live="polite"></span>
       </div>
     </div>
     <div class="container">
+      <p class="shop__count" id="catalogCount" aria-live="polite"></p>
       <div class="catalog" id="catalogGrid"></div>
       <div class="center"><button class="btn btn--outline" id="catalogMore" type="button" hidden></button></div>
     </div>
@@ -213,8 +213,8 @@
 </a>
 
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle" hidden>
-  <button class="lightbox__close" id="lightboxClose" type="button" aria-label="סגירה"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
   <figure class="lightbox__inner">
+    <button class="lightbox__close" id="lightboxClose" type="button" aria-label="סגירה"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
     <img id="lightboxImg" alt="">
     <figcaption>
       <h3 id="lightboxTitle"></h3>
