@@ -4,7 +4,12 @@ const nav = document.getElementById('nav');
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
-const onScroll = () => header.classList.toggle('header--scrolled', window.scrollY > 40);
+const waFloat = document.querySelector('.wa-float');
+const onScroll = () => {
+  header.classList.toggle('header--scrolled', window.scrollY > 40);
+  // The hero has its own call to action; the floating WhatsApp button joins once past it
+  waFloat.classList.toggle('wa-float--hidden', window.scrollY < window.innerHeight * 0.6);
+};
 onScroll();
 window.addEventListener('scroll', onScroll, { passive: true });
 
