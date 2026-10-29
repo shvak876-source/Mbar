@@ -4,7 +4,12 @@ const nav = document.getElementById('nav');
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
-const onScroll = () => header.classList.toggle('header--scrolled', window.scrollY > 40);
+const waFloat = document.querySelector('.wa-float');
+const onScroll = () => {
+  header.classList.toggle('header--scrolled', window.scrollY > 40);
+  // The hero has its own call to action; the floating WhatsApp button joins once past it
+  waFloat.classList.toggle('wa-float--hidden', window.scrollY < window.innerHeight * 0.6);
+};
 onScroll();
 window.addEventListener('scroll', onScroll, { passive: true });
 
@@ -52,7 +57,8 @@ const showMore = () => {
         <h3>${item.name}</h3>
         <p class="product__meta">${item.price || CATEGORIES[item.category] || ''}</p>
       </div>`;
-    card.querySelector('.product__zoom').addEventListener('click', () => openLightbox(item));
+    // The whole card opens the item sheet; the zoom button keeps it reachable by keyboard
+    card.addEventListener('click', e => { if (!e.target.closest('.product__quick')) openLightbox(item); });
     grid.appendChild(card);
   });
   shown = Math.min(shown + PAGE, items.length);
@@ -77,7 +83,10 @@ more.addEventListener('click', showMore);
   btn.textContent = label;
   btn.addEventListener('click', () => {
     filters.querySelectorAll('.filter').forEach(b => b.setAttribute('aria-pressed', b === btn));
+    btn.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
     renderCatalog(key);
+    // Coming from deep in a long list: jump back to the first item of the new category
+    if (grid.getBoundingClientRect().top < 0) grid.scrollIntoView({ behavior: 'smooth' });
   });
   filters.appendChild(btn);
 });
@@ -92,7 +101,7 @@ const openLightbox = item => {
   document.getElementById('lightboxImg').src = item.image;
   document.getElementById('lightboxImg').alt = item.name;
   document.getElementById('lightboxTitle').textContent = item.name;
-  document.getElementById('lightboxPrice').textContent = item.price || '';
+  document.getElementById('lightboxPrice').textContent = item.price || CATEGORIES[item.category] || '';
   document.getElementById('lightboxOrder').href = orderLink(item);
   lightbox.hidden = false;
   document.body.classList.add('no-scroll');
