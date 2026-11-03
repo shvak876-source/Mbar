@@ -487,3 +487,58 @@ html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
   .lightbox__inner figcaption { overflow: visible; }
   .lightbox__inner .btn { position: sticky; bottom: calc(8px + env(safe-area-inset-bottom)); box-shadow: 0 0 0 8px var(--white); }
 }
+
+/* ================= Motion + phone layer ================= */
+:root { --ease-out: cubic-bezier(0.23, 1, 0.32, 1); --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1); }
+::selection { background: var(--gold); color: var(--black); }
+html { scrollbar-color: var(--ink-2) var(--black); caret-color: var(--gold-ink); }
+
+/* One authored moment: the wordmark builds letter by letter */
+.hero__brand { animation: none; }
+.hero__brand .ch { display: inline-block; animation: chRise 1s var(--ease-out) calc(.3s + var(--i) * .09s) both; }
+@keyframes chRise { from { opacity: 0; transform: translateY(.35em); filter: blur(10px); } to { opacity: 1; transform: none; filter: blur(0); } }
+
+/* Catalogue cards rise in with the photo settling inside its frame */
+.product { opacity: 0; transform: translateY(26px); transition: opacity .55s var(--ease-out) var(--d, 0ms), transform .55s var(--ease-out) var(--d, 0ms); }
+.product--in { opacity: 1; transform: none; }
+.product__zoom { overflow: hidden; }
+.product:not(.product--in) .product__zoom img { transform: scale(1.12); }
+.product__zoom img { transition: transform .9s var(--ease-out); }
+
+/* Item sheet: slides up on phones, settles in on desktop */
+.lightbox:not([hidden]) { animation: veil .25s ease-out; }
+.lightbox:not([hidden]) .lightbox__inner { animation: sheetIn .32s var(--ease-drawer); }
+@keyframes veil { from { opacity: 0; } }
+@keyframes sheetIn { from { opacity: 0; transform: translateY(24px) scale(.97); } }
+@media (max-width: 760px) { @keyframes sheetIn { from { transform: translateY(100%); } } }
+
+/* Phone: quick-action dock for a local shop (WhatsApp, call, navigate) */
+.dock { display: none; }
+@media (max-width: 760px) {
+  .wa-float { display: none; }
+  body { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
+  .dock {
+    display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 8px;
+    position: fixed; z-index: 60; inset: auto 0 0 0;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+    background: rgba(12,10,9,.92); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); /* taste-skill-ignore: phone action bar */
+    transition: transform .35s var(--ease-out), opacity .25s;
+  }
+  .dock--hidden { transform: translateY(110%); opacity: 0; pointer-events: none; }
+  .dock__item {
+    display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px;
+    border-radius: 12px; background: rgba(255,255,255,.1); color: var(--white); font-size: .95rem; font-weight: 500;
+    transition: transform .15s var(--ease-out), background .2s;
+  }
+  .dock__item svg { width: 20px; height: 20px; }
+  .dock__item--wa { background: #1fa855; }
+  .dock__item:active { transform: scale(.96); }
+  .lightbox__inner .btn { bottom: calc(8px + env(safe-area-inset-bottom)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__brand .ch { animation: none; }
+  .product { opacity: 1; transform: none; transition: none; }
+  .product:not(.product--in) .product__zoom img { transform: none; }
+  .lightbox:not([hidden]), .lightbox:not([hidden]) .lightbox__inner { animation: none; }
+}
+@media (max-width: 760px) { .shop { padding: 72px 0 88px; } .shop__head { margin-bottom: 24px; } .shop__note { font-size: 1rem; } }

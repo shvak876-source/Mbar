@@ -5,10 +5,13 @@ const nav = document.getElementById('nav');
 document.getElementById('year').textContent = new Date().getFullYear();
 
 const waFloat = document.querySelector('.wa-float');
+const dock = document.querySelector('.dock');
 const onScroll = () => {
   header.classList.toggle('header--scrolled', window.scrollY > 40);
   // The hero has its own call to action; the floating WhatsApp button joins once past it
-  waFloat.classList.toggle('wa-float--hidden', window.scrollY < window.innerHeight * 0.6);
+  const past = window.scrollY >= window.innerHeight * 0.6;
+  waFloat.classList.toggle('wa-float--hidden', !past);
+  dock.classList.toggle('dock--hidden', !past);
 };
 onScroll();
 window.addEventListener('scroll', onScroll, { passive: true });
@@ -38,11 +41,15 @@ const WA_ICON = '<svg viewBox="0 0 32 32" width="18" height="18" aria-hidden="tr
 const count = document.getElementById('catalogCount');
 
 const PAGE = 12;
+// Cards rise in as they reach the viewport; two columns on phones, so the stagger alternates
+const cardObserver = new IntersectionObserver(entries => entries.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('product--in'); cardObserver.unobserve(e.target); }
+}), { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
 const more = document.getElementById('catalogMore');
 let items = [], shown = 0;
 
 const showMore = () => {
-  items.slice(shown, shown + PAGE).forEach(item => {
+  items.slice(shown, shown + PAGE).forEach((item, i) => {
     const card = document.createElement('article');
     card.className = 'product';
     card.innerHTML = `
@@ -59,7 +66,9 @@ const showMore = () => {
       </div>`;
     // The whole card opens the item sheet; the zoom button keeps it reachable by keyboard
     card.addEventListener('click', e => { openLightbox(item); });
+    card.style.setProperty('--d', `${(i % 2) * 70}ms`);
     grid.appendChild(card);
+    cardObserver.observe(card);
   });
   shown = Math.min(shown + PAGE, items.length);
   more.hidden = shown >= items.length;
