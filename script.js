@@ -29,7 +29,7 @@ nav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
 
 // Catalog
 const WHATSAPP = '972527566533';
-const orderLink = item => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`היי, אשמח לפרטים על: ${item.name}`)}`;
+const stockLink = (item, color, size) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`היי, אשמח לבדוק אם יש במלאי:\n${item.name}\nצבע: ${color}\nמידה: ${size}\nתודה!`)}`;
 const grid = document.getElementById('catalogGrid');
 const filters = document.getElementById('filters');
 const usedCategories = Object.keys(CATEGORIES).filter(key => PRODUCTS.some(p => p.category === key));
@@ -51,14 +51,14 @@ const showMore = () => {
           <img src="${item.image}" alt="${item.name}" width="600" height="800" loading="lazy">
         </button>
         ${item.isNew ? '<span class="product__badge">NEW</span>' : ''}
-        <a class="product__quick" href="${orderLink(item)}" target="_blank" rel="noopener">${WA_ICON}<span>להזמנה בוואטסאפ</span></a>
+        <button class="product__quick" type="button">${WA_ICON}<span>בחירת מידה וצבע</span></button>
       </div>
       <div class="product__body">
         <h3>${item.name}</h3>
         <p class="product__meta">${item.price || CATEGORIES[item.category] || ''}</p>
       </div>`;
     // The whole card opens the item sheet; the zoom button keeps it reachable by keyboard
-    card.addEventListener('click', e => { if (!e.target.closest('.product__quick')) openLightbox(item); });
+    card.addEventListener('click', e => { openLightbox(item); });
     grid.appendChild(card);
   });
   shown = Math.min(shown + PAGE, items.length);
@@ -96,17 +96,78 @@ renderCatalog('all');
 const lightbox = document.getElementById('lightbox');
 const lightboxClose = document.getElementById('lightboxClose');
 let lastFocus = null;
+const orderBtn = document.getElementById('lightboxOrder');
+const hint = document.getElementById('lightboxHint');
+const colorsEl = document.getElementById('lightboxColors');
+const sizesEl = document.getElementById('lightboxSizes');
+const colorName = document.getElementById('lightboxColorName');
+const sizeName = document.getElementById('lightboxSizeName');
+let current = null, chosenColor = null, chosenSize = null;
+
+const renderChart = category => {
+  const chart = SIZE_CHARTS[CHART_BY_CATEGORY[category]];
+  document.getElementById('sizeChart').innerHTML = `<table><thead><tr>${chart.head.map(h => `<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${chart.rows.map(r => `<tr><th scope="row">${r[0]}</th>${r.slice(1).map(c => `<td><span dir="ltr">${c}</span></td>`).join('')}</tr>`).join('')}</tbody></table><p class="sizechart__note">הטבלה כללית ויכולה להשתנות מעט בין דגמים. בין שתי מידות? שאלו אותנו בוואטסאפ.</p>`;
+};
+
+const refreshOrder = () => {
+  colorName.textContent = chosenColor || 'לא נבחר';
+  sizeName.textContent = chosenSize || 'לא נבחרה';
+  const ready = chosenColor && chosenSize;
+  orderBtn.setAttribute('aria-disabled', !ready);
+  if (ready) {
+    orderBtn.href = stockLink(current, chosenColor, chosenSize);
+    hint.textContent = '';
+  } else {
+    orderBtn.removeAttribute('href');
+    hint.textContent = !chosenSize && !chosenColor ? 'בחרו מידה וצבע כדי לבדוק מלאי' : !chosenSize ? 'בחרו מידה כדי לבדוק מלאי' : 'בחרו צבע כדי לבדוק מלאי';
+  }
+};
+
+const buildOptions = (container, values, getLabel, onPick, isColor) => {
+  container.innerHTML = '';
+  values.forEach(value => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = isColor ? 'swatch' : 'size';
+    b.setAttribute('aria-pressed', false);
+    if (isColor) {
+      b.setAttribute('aria-label', value);
+      b.title = value;
+      b.innerHTML = `<span style="background:${COLOR_SWATCHES[value] || '#999'}"></span>`;
+    } else {
+      b.textContent = value;
+    }
+    b.addEventListener('click', () => {
+      container.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+      onPick(value);
+      refreshOrder();
+    });
+    container.appendChild(b);
+  });
+};
+
 const openLightbox = item => {
   lastFocus = document.activeElement;
+  current = item;
+  chosenSize = null;
+  chosenColor = item.colors.length === 1 ? item.colors[0] : null;
   document.getElementById('lightboxImg').src = item.image;
   document.getElementById('lightboxImg').alt = item.name;
   document.getElementById('lightboxTitle').textContent = item.name;
   document.getElementById('lightboxPrice').textContent = item.price || CATEGORIES[item.category] || '';
-  document.getElementById('lightboxOrder').href = orderLink(item);
+  buildOptions(colorsEl, item.colors, null, v => { chosenColor = v; }, true);
+  if (chosenColor) colorsEl.firstChild.setAttribute('aria-pressed', true);
+  buildOptions(sizesEl, item.sizes || SIZES[item.category], null, v => { chosenSize = v; }, false);
+  renderChart(item.category);
+  document.querySelector('.sizechart').open = false;
+  refreshOrder();
   lightbox.hidden = false;
   document.body.classList.add('no-scroll');
   lightboxClose.focus();
 };
+orderBtn.addEventListener('click', e => {
+  if (orderBtn.getAttribute('aria-disabled') === 'true') { e.preventDefault(); hint.textContent = 'כדי לבדוק מלאי צריך לבחור מידה וצבע'; }
+});
 const closeLightbox = () => {
   lightbox.hidden = true;
   document.body.classList.remove('no-scroll');

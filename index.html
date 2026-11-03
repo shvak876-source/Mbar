@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
   <meta name="theme-color" content="#0c0a09">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=12">
   <script>document.documentElement.classList.remove('no-js')</script>
 </head>
 <body>
@@ -213,12 +213,25 @@
     <figcaption>
       <h3 id="lightboxTitle"></h3>
       <p id="lightboxPrice"></p>
-      <a class="btn btn--dark" id="lightboxOrder" target="_blank" rel="noopener">להזמנה בוואטסאפ</a>
+      <fieldset class="opt" id="colorField">
+        <legend>צבע: <span id="lightboxColorName"></span></legend>
+        <div class="swatches" id="lightboxColors"></div>
+      </fieldset>
+      <fieldset class="opt">
+        <legend>מידה: <span id="lightboxSizeName">לא נבחרה</span></legend>
+        <div class="sizes" id="lightboxSizes"></div>
+      </fieldset>
+      <details class="sizechart">
+        <summary>טבלת מידות</summary>
+        <div id="sizeChart"></div>
+      </details>
+      <p class="hint" id="lightboxHint" role="status"></p>
+      <a class="btn btn--dark" id="lightboxOrder" target="_blank" rel="noopener" aria-disabled="true">לבירור מלאי בוואטסאפ</a>
     </figcaption>
   </figure>
 </div>
 
-<script src="products.js?v=9" defer></script>
-<script src="script.js?v=9" defer></script>
+<script src="products.js?v=12" defer></script>
+<script src="script.js?v=12" defer></script>
 </body>
 </html>
