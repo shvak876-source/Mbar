@@ -136,3 +136,14 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.15 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Google Maps loads only when asked for, so nothing reaches Google before the visitor chooses it
+const mapButton = document.querySelector('.map-load');
+mapButton.addEventListener('click', () => {
+  const frame = document.createElement('iframe');
+  frame.title = 'מפה – MBAR, תל חי 100 קריית שמונה';
+  frame.src = mapButton.dataset.src;
+  frame.referrerPolicy = 'no-referrer-when-downgrade';
+  mapButton.replaceWith(frame);
+  frame.focus();
+});
